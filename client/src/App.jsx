@@ -28,10 +28,11 @@ const App = () => {
   const {isAuthenticated, isLoading, user}  = useSelector((state)=>state.authReducer);
 
   const dispatch = useDispatch();
+  const token = JSON.parse(sessionStorage.getItem("token"));
 
   useEffect(()=>{
     
-    dispatch(authCheck())
+    dispatch(authCheck(token))
   },[dispatch]);
 
   // console.log(isAuthenticated, isLoading, user);

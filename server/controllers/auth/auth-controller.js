@@ -62,7 +62,7 @@ class AuthController {
           id: user._id,
           role: user.role,
           email: user.email,
-          userName:user.userName
+          userName: user.userName,
         },
         secretKey,
         { expiresIn: "60m" }
@@ -71,28 +71,65 @@ class AuthController {
       // extract user info excluding the password
       // const { password: pas, ...rest } = user._doc;
 
-      // sending cookie with response
-      res
-        // .cookie("token", token, { httpOnly: true, secure: false })
-        .cookie("token", token)
-        .status(200)
-        .json({
-          success: true,
-          message: "Logged in successfully",
-          user: {id: user._id,
+      // before I was sending cookie with response
+      // res.cookie("token", token, { httpOnly: true, secure: true })
+      //   .status(200)
+      //   .json({
+      //     success: true,
+      //     message: "Logged in successfully",
+      //     user: {id: user._id,
+      //     role: user.role,
+      //     email: user.email,
+      //     userName:user.userName},
+      //   });
+      // but now I'm sending token to the front end itself
+      res.status(200).json({
+        success: true,
+        message: "Logged in successfully",
+        token,
+        user: {
+          id: user._id,
           role: user.role,
           email: user.email,
-          userName:user.userName},
-        });
+          userName: user.userName,
+        },
+      });
     } catch (error) {
       console.log(error);
       next(error);
     }
   }
 
-  // function to verify user authentication
+  // this was used before, while getting token from the cookie
+  // // function to verify user authentication 
+  // static async authMiddleware(req, res, next) {
+  //   const token = req.cookies.token; // I used to get the token from the cookies
+
+  //   if (!token) return next(handleError(401, "Unathorized user"));
+
+  //   try {
+  //     jwt.verify(token, secretKey, (err, user) => {
+  //       if (err) return next(handleError(401, "Unathorized user"));
+  //       res
+  //         .status(200)
+  //         .json({ success: true, message: "Authenticated user", user });
+  //       next();
+  //     });
+
+  //     // const decoded = jwt.verify(token, secretKey);
+  //     // req.user = decoded;
+  //     next();
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+
+
+  
+  // function to verify user authentication by getting token from the authorizarion
   static async authMiddleware(req, res, next) {
-    const token = req.cookies.token;
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
     if (!token) return next(handleError(401, "Unathorized user"));
 
     try {
@@ -112,6 +149,7 @@ class AuthController {
     }
   }
 
+
   // logout function
   static async authLogout(req, res) {
     try {
@@ -119,7 +157,9 @@ class AuthController {
       res.clearCookie("token");
 
       // Send a successful response
-      res.status(200).json({success:true, message: "Logged out successfully" });
+      res
+        .status(200)
+        .json({ success: true, message: "Logged out successfully" });
     } catch (error) {
       next(error); // Pass any error to the error-handling middleware
     }

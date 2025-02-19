@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { authLogout } from "@/store/auth-slice";
+import { authLogout, resetTokenAndCredentials } from "@/store/auth-slice";
 import UserCartWrapper from "@/pages/user-view/cart-wrapper";
 import { fetchCartItems } from "@/store/user/cart-slice";
 import { Label } from "../ui/label";
@@ -52,7 +52,9 @@ location.pathname.includes("listing") && currentFilters !== null
 */
     sessionStorage.removeItem("filters");
     const currentFilters =
-      getCurrentMenuItem.id !== "home" && getCurrentMenuItem.id !== "products" && getCurrentMenuItem.id !== "search"
+      getCurrentMenuItem.id !== "home" &&
+      getCurrentMenuItem.id !== "products" &&
+      getCurrentMenuItem.id !== "search"
         ? { category: [getCurrentMenuItem.id] }
         : null;
     sessionStorage.setItem("filters", JSON.stringify(currentFilters));
@@ -60,6 +62,9 @@ location.pathname.includes("listing") && currentFilters !== null
       ? setSearchParams(`?category=${getCurrentMenuItem.id}`)
       : navigate(getCurrentMenuItem.path);
   }
+
+ 
+
   return (
     <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
       {shoppingViewMenuItems.map((menuItem) => (
@@ -87,6 +92,13 @@ function HeaderRightContent() {
       dispatch(fetchCartItems(user?.id));
     }
   }, [user, dispatch]);
+
+  function handleLogout() {
+  // dispatch(authLogout()) // no need to call this function anymore
+    dispatch(resetTokenAndCredentials());
+    sessionStorage.clear();
+    navigate("/auth/login");
+  }
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
       <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
@@ -98,7 +110,9 @@ function HeaderRightContent() {
         >
           <ShoppingCart className="w-6 h-6" />
           <span className="sr-only">User cart</span>
-          <span className="absolute top-[-1px] right-[4px] font-bold">{cartItems?.length > 0 ? cartItems?.length : null}</span>
+          <span className="absolute top-[-1px] right-[4px] font-bold">
+            {cartItems?.length > 0 ? cartItems?.length : null}
+          </span>
         </Button>
         {/* UsercartWrapper component contains all the cart item */}
         <UserCartWrapper
@@ -123,7 +137,7 @@ function HeaderRightContent() {
             Account
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => dispatch(authLogout())}>
+          <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4 " />
             Logout
           </DropdownMenuItem>

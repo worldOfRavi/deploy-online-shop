@@ -48,12 +48,12 @@ const brandsWithIcons = [
   { id: "h&m", label: "H&N", icon: hnm },
 ];
 const UserHome = () => {
+
   // states to handle the slides for the banner
   const [currentSlide, setCurrentSlide] = useState(0);
   const { productList, productDetails } = useSelector(
     (state) => state.userProductReducer
   );
-  // console.log(productList);
   
   const { user } = useSelector((state) => state.authReducer);
   // state to manage the product details dialog
@@ -119,6 +119,8 @@ const UserHome = () => {
       dispatch(getFeatureImages())
     },[dispatch]);
 
+    // featured products only shows 4 items in home page
+    const featuredProducts = productList && productList.length > 4 ? productList.slice(0,4) : productList
   return (
     <div className="flex flex-col min-h-screen">
       {/* banner section start*/}
@@ -221,8 +223,8 @@ const UserHome = () => {
             Feature Products
           </h2>
           <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {productList && productList.length > 0
-              ? productList.map((productItem) => (
+            {featuredProducts && featuredProducts.length > 0
+              ? featuredProducts.map((productItem) => (
                   <UserProductTile
                     key={productItem._id}
                     product={productItem}
