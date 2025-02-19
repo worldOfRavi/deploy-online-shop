@@ -147,7 +147,7 @@ class OrderController {
   static async getAllOrderByUser(req, res, next) {
     try {
       const { userId } = req.params;
-      const orders = await Order.find({ userId });
+      const orders = await Order.find({ userId }).sort({ orderDate: -1 });
       if (!orders.length) next(handleError(404, "No order found"));
 
       res.status(200).json({
