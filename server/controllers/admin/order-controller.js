@@ -5,7 +5,7 @@ class AdminOrderController {
     // function to fetch all the order by all users
     static async getAllOrderOfAllUsers(req, res, next) {
         try {
-          const orders = await Order.find();
+          const orders = await Order.find().sort({orderDate:-1})
           if (!orders.length) next(handleError(404, "No order found"));
     
           res.status(200).json({
