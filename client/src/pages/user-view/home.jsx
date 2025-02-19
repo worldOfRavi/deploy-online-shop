@@ -124,7 +124,7 @@ const UserHome = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* banner section start*/}
-      <div className="relative w-full h-[600px] overflow-hidden">
+      <div className=" hidden md:block relative w-full h-[600px] overflow-hidden">
         {featureImageList && featureImageList.length>0 &&  featureImageList.map((banner, index) => (
           <img
             key={index}
